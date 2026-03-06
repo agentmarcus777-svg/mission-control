@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #111127;
+  --bg-card: #151530;
+  --gold: #f59e0b;
+  --gold-dim: #b37a08;
+  --gold-glow: rgba(245, 158, 11, 0.3);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border: rgba(245, 158, 11, 0.15);
+  --green: #22c55e;
+  --red: #ef4444;
+  --blue: #3b82f6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dim);
+  border-radius: 3px;
+}
+
+/* Grid lines background */
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Glow effects */
+.gold-glow {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 60px rgba(245, 158, 11, 0.05);
+}
+
+.gold-glow-strong {
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.25), 0 0 80px rgba(245, 158, 11, 0.1);
+}
+
+/* Scan line effect */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+.scanline::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent);
+  animation: scan 4s linear infinite;
+}
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* Pulse dot */
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+.pulse-dot.warning {
+  background: var(--gold);
+}
+.pulse-dot.error {
+  background: var(--red);
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+}
+
+/* Card hover */
+.empire-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.empire-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.empire-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.1);
+}
+.empire-card:hover::before {
+  opacity: 1;
+}
+
+/* Time filter buttons */
+.time-btn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.time-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.time-btn.active {
+  background: var(--gold);
+  color: #000;
+  border-color: var(--gold);
+}
+
+/* Activity feed item */
+.feed-item {
+  padding: 12px 16px;
+  border-left: 2px solid var(--border);
+  margin-left: 8px;
+  transition: all 0.2s;
+}
+.feed-item:hover {
+  border-left-color: var(--gold);
+  background: rgba(245, 158, 11, 0.03);
+}
+
+/* Ticker */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-wrap {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: ticker 30s linear infinite;
+}
+
+/* Globe container */
+.globe-container {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
