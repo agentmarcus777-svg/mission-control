@@ -1,28 +1,15 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface FeedItem {
+  id: string;
   time: string;
   message: string;
   type: 'success' | 'info' | 'warning' | 'error';
   source: string;
 }
-
-const feedItems: FeedItem[] = [
-  { time: '19:21', message: 'Mission Control dashboard deployed', type: 'success', source: 'MARCUS' },
-  { time: '18:45', message: 'POD batch #47 completed — 12 designs generated', type: 'success', source: 'POD' },
-  { time: '18:30', message: 'Dropbox sync: 12 files uploaded to Spring 2026', type: 'info', source: 'DROPBOX' },
-  { time: '17:15', message: 'Printify: 3 new products published to Aura Clothing', type: 'success', source: 'PRINTIFY' },
-  { time: '16:42', message: 'MDP report pulled — Bob Ross Tee still #1 bestseller', type: 'info', source: 'MDP' },
-  { time: '15:30', message: 'Oneshot build v2.1.0 submitted to TestFlight', type: 'success', source: 'ONESHOT' },
-  { time: '14:20', message: 'Email: Target buyer review scheduled for Friday', type: 'warning', source: 'EMAIL' },
-  { time: '13:05', message: 'Amazon order #847 fulfilled — Duck Dynasty Hoodie', type: 'success', source: 'AMAZON' },
-  { time: '12:30', message: 'Notion task board updated — 4 tasks completed', type: 'info', source: 'NOTION' },
-  { time: '11:15', message: 'Kohl\'s product URLs verified via reverse image search', type: 'info', source: 'TOOLS' },
-  { time: '10:00', message: 'Morning systems check — all nodes operational', type: 'success', source: 'SYSTEM' },
-  { time: '09:30', message: 'Calendar: Blended Clothing production call at 2pm', type: 'warning', source: 'CALENDAR' },
-];
 
 const typeColors: Record<string, string> = {
   success: '#22c55e',
@@ -39,65 +26,119 @@ const typeIcons: Record<string, string> = {
 };
 
 export default function ActivityFeed() {
+  const [items, setItems] = useState<FeedItem[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<string>('');
+
+  const fetchActivity = async () => {
+    try {
+      const res = await fetch('/api/activity');
+      const data = await res.json();
+      const mapped = data.map((item: { id: string; time: string; message: string; type: string; source: string }) => ({
+        id: item.id,
+        time: new Date(item.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+        message: item.message,
+        type: item.type,
+        source: item.source,
+      }));
+      setItems(mapped);
+      setLastUpdate(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
+    } catch (err) {
+      console.error('Failed to fetch activity:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchActivity();
+    const interval = setInterval(fetchActivity, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '2px',
-      maxHeight: '500px',
-      overflowY: 'auto',
-    }}>
-      {feedItems.map((item, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.05, duration: 0.3 }}
-          className="feed-item"
-          style={{ borderLeftColor: typeColors[item.type] }}
-        >
-          <div style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '10px',
-          }}>
-            <span style={{
-              color: typeColors[item.type],
-              fontSize: '12px',
-              fontWeight: 600,
-              minWidth: '14px',
-            }}>
-              {typeIcons[item.type]}
-            </span>
-            <div style={{ flex: 1 }}>
-              <div style={{
-                fontSize: '12px',
-                color: '#e2e8f0',
-                lineHeight: '1.4',
-              }}>
-                {item.message}
-              </div>
+    <div>
+      {/* Live indicator */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '8px',
+        marginBottom: '8px',
+        fontSize: '9px',
+        color: '#475569',
+        fontFamily: "'JetBrains Mono', monospace",
+      }}>
+        <span style={{
+          width: '6px',
+          height: '6px',
+          borderRadius: '50%',
+          background: '#22c55e',
+          display: 'inline-block',
+          animation: 'pulse 2s ease-in-out infinite',
+        }} />
+        LIVE • Updated {lastUpdate}
+      </div>
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2px',
+        maxHeight: '500px',
+        overflowY: 'auto',
+      }}>
+        <AnimatePresence>
+          {items.map((item, i) => (
+            <motion.div
+              key={item.id || i}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ delay: i * 0.03, duration: 0.3 }}
+              className="feed-item"
+              style={{ borderLeftColor: typeColors[item.type] }}
+            >
               <div style={{
                 display: 'flex',
-                gap: '12px',
-                marginTop: '4px',
-                fontSize: '10px',
-                color: '#475569',
+                alignItems: 'flex-start',
+                gap: '10px',
               }}>
-                <span>{item.time}</span>
                 <span style={{
                   color: typeColors[item.type],
-                  opacity: 0.7,
-                  fontFamily: "'JetBrains Mono', monospace",
-                  letterSpacing: '0.5px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  minWidth: '14px',
                 }}>
-                  {item.source}
+                  {typeIcons[item.type]}
                 </span>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#e2e8f0',
+                    lineHeight: '1.4',
+                  }}>
+                    {item.message}
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    gap: '12px',
+                    marginTop: '4px',
+                    fontSize: '10px',
+                    color: '#475569',
+                  }}>
+                    <span>{item.time}</span>
+                    <span style={{
+                      color: typeColors[item.type],
+                      opacity: 0.7,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      letterSpacing: '0.5px',
+                    }}>
+                      {item.source}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </motion.div>
-      ))}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,135 @@
+[
+  {
+    "id": "mem-001",
+    "type": "memory",
+    "content": "Blake prefers amber/gold accent colors for all dashboards. NASA command center aesthetic.",
+    "source": "MEMORY.md",
+    "timestamp": "2025-03-05T10:00:00-08:00"
+  },
+  {
+    "id": "mem-002",
+    "type": "memory",
+    "content": "Titus Mac Mini (192.168.81.123) configured as second compute node. M4 Pro, 24GB RAM.",
+    "source": "TOOLS.md",
+    "timestamp": "2025-03-04T14:00:00-08:00"
+  },
+  {
+    "id": "mem-003",
+    "type": "memory",
+    "content": "POD pipeline uses Gemini 2.5 Flash for image generation. Replicate as fallback.",
+    "source": "MEMORY.md",
+    "timestamp": "2025-03-03T09:00:00-08:00"
+  },
+  {
+    "id": "mem-004",
+    "type": "memory",
+    "content": "Printify API token expires 2026-06-01. Store ID 24727556 is main Amazon store.",
+    "source": "TOOLS.md",
+    "timestamp": "2025-03-01T11:00:00-08:00"
+  },
+  {
+    "id": "mem-005",
+    "type": "memory",
+    "content": "Bob Ross licensing deal renewed through 2027. Revenue share at 8%.",
+    "source": "MEMORY.md",
+    "timestamp": "2025-02-28T16:00:00-08:00"
+  },
+  {
+    "id": "task-001",
+    "type": "task",
+    "content": "Deploy Mission Control v2 with search, calendar, and activity feed upgrades",
+    "source": "Notion Task Board",
+    "timestamp": "2025-03-05T08:00:00-08:00"
+  },
+  {
+    "id": "task-002",
+    "type": "task",
+    "content": "Generate POD batch #48 — Summer Duck Dynasty collection (15 designs)",
+    "source": "Notion Task Board",
+    "timestamp": "2025-03-05T09:00:00-08:00"
+  },
+  {
+    "id": "task-003",
+    "type": "task",
+    "content": "Submit Target Plus Spring 2026 mockups for buyer review by Friday",
+    "source": "Notion Task Board",
+    "timestamp": "2025-03-04T10:00:00-08:00"
+  },
+  {
+    "id": "task-004",
+    "type": "task",
+    "content": "Update MDP licensor report — pull latest sales data for Bob Ross and NatLamp",
+    "source": "Notion Task Board",
+    "timestamp": "2025-03-04T11:00:00-08:00"
+  },
+  {
+    "id": "task-005",
+    "type": "task",
+    "content": "Configure Oneshot v2.2 — add premium 3D templates via Meshy API",
+    "source": "Notion Task Board",
+    "timestamp": "2025-03-03T14:00:00-08:00"
+  },
+  {
+    "id": "task-006",
+    "type": "task",
+    "content": "Set up automated Kohl's URL verification pipeline with reverse image search",
+    "source": "Notion Task Board",
+    "timestamp": "2025-03-02T09:00:00-08:00"
+  },
+  {
+    "id": "conv-001",
+    "type": "conversation",
+    "content": "Blake: 'The POD pipeline is working great. Let's scale to 20 designs per batch next week.'",
+    "source": "iMessage",
+    "timestamp": "2025-03-05T17:00:00-08:00"
+  },
+  {
+    "id": "conv-002",
+    "type": "conversation",
+    "content": "Blake: 'Check if the Kohl's Bob Ross tee is still showing the right product URL'",
+    "source": "iMessage",
+    "timestamp": "2025-03-05T12:00:00-08:00"
+  },
+  {
+    "id": "conv-003",
+    "type": "conversation",
+    "content": "Blake: 'Need a dashboard — something like Bloomberg terminal meets NASA mission control'",
+    "source": "iMessage",
+    "timestamp": "2025-03-04T20:00:00-08:00"
+  },
+  {
+    "id": "conv-004",
+    "type": "conversation",
+    "content": "Discussion about SHEIN seller approval process. 2 products approved, 1 pending review.",
+    "source": "iMessage",
+    "timestamp": "2025-03-04T15:00:00-08:00"
+  },
+  {
+    "id": "conv-005",
+    "type": "conversation",
+    "content": "Blended Clothing call notes: Maurice's wants 500 units of Duck Dynasty hoodies for Fall.",
+    "source": "iMessage",
+    "timestamp": "2025-03-03T16:00:00-08:00"
+  },
+  {
+    "id": "mem-006",
+    "type": "memory",
+    "content": "Amazon Seller Central login: blake@bcilicensing.com. Store: Aura Clothing Co.",
+    "source": "TOOLS.md",
+    "timestamp": "2025-02-25T10:00:00-08:00"
+  },
+  {
+    "id": "task-007",
+    "type": "task",
+    "content": "Review and update Dropbox team folder permissions for BC Designs",
+    "source": "Notion Task Board",
+    "timestamp": "2025-03-01T13:00:00-08:00"
+  },
+  {
+    "id": "conv-006",
+    "type": "conversation",
+    "content": "Alex Nahabed shared new Duck Dynasty artwork proofs via Dropbox. Needs approval by EOD.",
+    "source": "Email",
+    "timestamp": "2025-03-05T11:30:00-08:00"
+  }
+]
