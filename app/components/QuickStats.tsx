@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 interface Stat {
@@ -9,16 +10,93 @@ interface Stat {
   positive: boolean;
 }
 
-const stats: Stat[] = [
-  { label: 'REVENUE (MTD)', value: '$18,247', change: '+12.3%', positive: true },
-  { label: 'ACTIVE SKUS', value: '147', change: '+8', positive: true },
-  { label: 'DESIGNS TODAY', value: '12', change: '+4', positive: true },
-  { label: 'ORDERS (MTD)', value: '234', change: '+18%', positive: true },
-  { label: 'ACTIVE DEALS', value: '7', change: '0', positive: true },
-  { label: 'PLATFORMS', value: '6', change: '+1', positive: true },
-];
+interface PipelineStats {
+  passed: number;
+  failed: number;
+  errors: number;
+  avgScore: number;
+}
+
+interface PipelineData {
+  totalDesigns: number;
+  passedDesigns: number;
+  errorDesigns: number;
+  batches: Array<{ id: string }>;
+  stats: PipelineStats;
+  costs: Record<string, number>;
+  pipelineStatus: string;
+}
 
 export default function QuickStats() {
+  const [stats, setStats] = useState<Stat[]>([
+    { label: 'TOTAL DESIGNS', value: '—', change: '', positive: true },
+    { label: 'PASSED QA', value: '—', change: '', positive: true },
+    { label: 'PASS RATE', value: '—', change: '', positive: true },
+    { label: 'AVG SCORE', value: '—', change: '', positive: true },
+    { label: 'BATCHES RUN', value: '—', change: '', positive: true },
+    { label: 'PIPELINE COST', value: '—', change: '', positive: true },
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/api/pipeline-status');
+        if (!res.ok) return;
+        const data: PipelineData = await res.json();
+
+        const totalCost = Object.values(data.costs).reduce((a, b) => a + b, 0);
+        const passRate = data.totalDesigns > 0
+          ? Math.round((data.passedDesigns / data.totalDesigns) * 100)
+          : 0;
+
+        setStats([
+          {
+            label: 'TOTAL DESIGNS',
+            value: data.totalDesigns.toString(),
+            change: `${data.errorDesigns} errors`,
+            positive: data.errorDesigns === 0,
+          },
+          {
+            label: 'PASSED QA',
+            value: data.passedDesigns.toString(),
+            change: `of ${data.totalDesigns}`,
+            positive: true,
+          },
+          {
+            label: 'PASS RATE',
+            value: `${passRate}%`,
+            change: data.stats.avgScore > 70 ? 'good' : 'needs work',
+            positive: passRate >= 50,
+          },
+          {
+            label: 'AVG SCORE',
+            value: `${data.stats.avgScore}/100`,
+            change: `${data.stats.passed} passed`,
+            positive: data.stats.avgScore >= 70,
+          },
+          {
+            label: 'BATCHES RUN',
+            value: data.batches.length.toString(),
+            change: data.pipelineStatus,
+            positive: data.pipelineStatus === 'complete',
+          },
+          {
+            label: 'PIPELINE COST',
+            value: `$${totalCost.toFixed(2)}`,
+            change: 'all-time',
+            positive: true,
+          },
+        ]);
+      } catch {
+        // Keep showing "—" if pipeline unreachable
+      }
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div style={{
       display: 'grid',
@@ -62,7 +140,7 @@ export default function QuickStats() {
             marginTop: '4px',
             fontFamily: "'JetBrains Mono', monospace",
           }}>
-            {stat.positive ? '▲' : '▼'} {stat.change}
+            {stat.change}
           </div>
         </motion.div>
       ))}

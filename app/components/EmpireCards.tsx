@@ -1,104 +1,24 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+
+interface StatEntry {
+  label: string;
+  value: string;
+  trend?: 'up' | 'down' | 'neutral';
+}
 
 interface CardData {
   icon: string;
   title: string;
   subtitle: string;
-  stats: { label: string; value: string; trend?: 'up' | 'down' | 'neutral' }[];
+  stats: StatEntry[];
   status: 'online' | 'warning' | 'offline';
   link?: string;
   color: string;
+  lastUpdated?: string;
 }
-
-const cards: CardData[] = [
-  {
-    icon: '🎨',
-    title: 'POD Pipeline',
-    subtitle: 'Print-on-Demand Operations',
-    stats: [
-      { label: 'Today', value: '12 designs', trend: 'up' },
-      { label: 'Pass Rate', value: '94%', trend: 'up' },
-      { label: 'Queue', value: '3 pending' },
-    ],
-    status: 'online',
-    link: 'http://localhost:3001',
-    color: '#22c55e',
-  },
-  {
-    icon: '🎮',
-    title: 'Oneshot',
-    subtitle: 'iOS Game App',
-    stats: [
-      { label: 'Version', value: 'v2.1.0' },
-      { label: 'TestFlight', value: 'Active', trend: 'up' },
-      { label: 'Downloads', value: '342' },
-    ],
-    status: 'online',
-    color: '#8b5cf6',
-  },
-  {
-    icon: '💰',
-    title: 'Aura Clothing',
-    subtitle: 'Amazon Store Revenue',
-    stats: [
-      { label: 'Revenue', value: '$2,847', trend: 'up' },
-      { label: 'Orders', value: '85 total' },
-      { label: 'Active SKUs', value: '47' },
-    ],
-    status: 'online',
-    color: '#f59e0b',
-  },
-  {
-    icon: '📊',
-    title: 'MDP',
-    subtitle: 'Monster Digital Platform',
-    stats: [
-      { label: 'Units Sold', value: '847', trend: 'up' },
-      { label: 'Bestseller', value: 'Bob Ross Tee' },
-      { label: 'Retailers', value: '4 active' },
-    ],
-    status: 'online',
-    color: '#3b82f6',
-  },
-  {
-    icon: '📱',
-    title: 'Marketing',
-    subtitle: 'Social & Outreach',
-    stats: [
-      { label: 'Campaigns', value: '2 active' },
-      { label: 'Reach', value: '12.4K' },
-      { label: 'Engagement', value: '4.2%' },
-    ],
-    status: 'warning',
-    color: '#ec4899',
-  },
-  {
-    icon: '💡',
-    title: 'New Ideas',
-    subtitle: 'Innovation Pipeline',
-    stats: [
-      { label: 'Concepts', value: '8 active' },
-      { label: 'In Review', value: '3' },
-      { label: 'Launched', value: '2 this month' },
-    ],
-    status: 'online',
-    color: '#14b8a6',
-  },
-  {
-    icon: '🎬',
-    title: 'Licensing',
-    subtitle: 'NatLamp • Bob Ross • Duck Dynasty',
-    stats: [
-      { label: 'Active Deals', value: '3' },
-      { label: 'Revenue Share', value: '$18.2K' },
-      { label: 'Renewals', value: '2 upcoming' },
-    ],
-    status: 'online',
-    color: '#f97316',
-  },
-];
 
 function StatusDot({ status }: { status: string }) {
   const cls = status === 'online' ? '' : status === 'warning' ? 'warning' : 'error';
@@ -113,6 +33,45 @@ function TrendArrow({ trend }: { trend?: string }) {
 }
 
 export default function EmpireCards() {
+  const [cards, setCards] = useState<CardData[]>(getDefaultCards());
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/api/pipeline-status');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const totalCost = Object.values(data.costs as Record<string, number>).reduce((a: number, b: number) => a + b, 0);
+        const passRate = data.totalDesigns > 0
+          ? Math.round((data.passedDesigns / data.totalDesigns) * 100)
+          : 0;
+
+        setCards(prev => prev.map(card => {
+          if (card.title === 'POD Pipeline') {
+            return {
+              ...card,
+              stats: [
+                { label: 'Designs', value: `${data.passedDesigns} passed / ${data.totalDesigns} total`, trend: 'up' as const },
+                { label: 'Pass Rate', value: `${passRate}%`, trend: passRate >= 50 ? 'up' as const : 'down' as const },
+                { label: 'Cost', value: `$${totalCost.toFixed(2)}` },
+              ],
+              status: data.pipelineStatus === 'complete' ? 'online' as const : 'warning' as const,
+              lastUpdated: data.lastUpdated,
+            };
+          }
+          return card;
+        }));
+      } catch {
+        // Keep defaults
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div style={{
       display: 'grid',
@@ -134,7 +93,6 @@ export default function EmpireCards() {
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
             <div className="empire-card">
-              {/* Header */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -164,7 +122,6 @@ export default function EmpireCards() {
                 <StatusDot status={card.status} />
               </div>
 
-              {/* Stats */}
               <div style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -192,7 +149,6 @@ export default function EmpireCards() {
                 ))}
               </div>
 
-              {/* Bottom bar */}
               <div style={{
                 marginTop: '16px',
                 paddingTop: '12px',
@@ -202,7 +158,7 @@ export default function EmpireCards() {
                 display: 'flex',
                 justifyContent: 'space-between',
               }}>
-                <span>Updated 2m ago</span>
+                <span>{card.lastUpdated ? `Updated ${new Date(card.lastUpdated).toLocaleTimeString()}` : 'No live data'}</span>
                 {card.link && <span style={{ color: '#f59e0b' }}>Open →</span>}
               </div>
             </div>
@@ -211,4 +167,82 @@ export default function EmpireCards() {
       ))}
     </div>
   );
+}
+
+function getDefaultCards(): CardData[] {
+  return [
+    {
+      icon: '🎨',
+      title: 'POD Pipeline',
+      subtitle: 'Print-on-Demand Design Factory',
+      stats: [
+        { label: 'Designs', value: 'Loading...', trend: 'neutral' },
+        { label: 'Pass Rate', value: '—' },
+        { label: 'Cost', value: '—' },
+      ],
+      status: 'warning',
+      link: 'http://localhost:3001',
+      color: '#22c55e',
+    },
+    {
+      icon: '💰',
+      title: 'Aura Clothing',
+      subtitle: 'Amazon POD Store',
+      stats: [
+        { label: 'Revenue', value: '—', trend: 'neutral' },
+        { label: 'Orders', value: '—' },
+        { label: 'Active SKUs', value: '—' },
+      ],
+      status: 'offline',
+      color: '#f59e0b',
+    },
+    {
+      icon: '📊',
+      title: 'MDP',
+      subtitle: 'Monster Digital Platform',
+      stats: [
+        { label: 'Units Sold', value: '—', trend: 'neutral' },
+        { label: 'Bestseller', value: '—' },
+        { label: 'Retailers', value: '—' },
+      ],
+      status: 'offline',
+      color: '#3b82f6',
+    },
+    {
+      icon: '🎬',
+      title: 'Licensing',
+      subtitle: 'NatLamp • Bob Ross • Duck Dynasty',
+      stats: [
+        { label: 'Active Deals', value: '—' },
+        { label: 'Revenue Share', value: '—' },
+        { label: 'Renewals', value: '—' },
+      ],
+      status: 'offline',
+      color: '#f97316',
+    },
+    {
+      icon: '🎮',
+      title: 'Oneshot',
+      subtitle: 'iOS Game App',
+      stats: [
+        { label: 'Version', value: '—' },
+        { label: 'TestFlight', value: '—' },
+        { label: 'Downloads', value: '—' },
+      ],
+      status: 'offline',
+      color: '#8b5cf6',
+    },
+    {
+      icon: '🖥️',
+      title: 'Infrastructure',
+      subtitle: 'Marcus + Titus Compute',
+      stats: [
+        { label: 'Marcus', value: 'M4 • 192.168.81.76' },
+        { label: 'Titus', value: 'M4 Pro • 192.168.81.123' },
+        { label: 'Gateway', value: 'Port 18789' },
+      ],
+      status: 'online',
+      color: '#14b8a6',
+    },
+  ];
 }

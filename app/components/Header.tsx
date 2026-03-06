@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 export default function Header() {
   const [time, setTime] = useState('');
   const [date, setDate] = useState('');
+  const [ticker, setTicker] = useState('LOADING PIPELINE DATA...');
 
   useEffect(() => {
     const update = () => {
@@ -24,6 +25,38 @@ export default function Header() {
     };
     update();
     const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchTicker = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/api/pipeline-status');
+        if (!res.ok) {
+          setTicker('PIPELINE OFFLINE — Dashboard at localhost:3001 unreachable');
+          return;
+        }
+        const data = await res.json();
+        const totalCost = Object.values(data.costs as Record<string, number>).reduce((a: number, b: number) => a + b, 0);
+        const passRate = data.totalDesigns > 0
+          ? Math.round((data.passedDesigns / data.totalDesigns) * 100)
+          : 0;
+
+        const items = [
+          `POD ${data.passedDesigns}/${data.totalDesigns} passed (${passRate}%)`,
+          `${data.batches?.length || 0} batches run`,
+          `Avg score: ${data.stats?.avgScore || '—'}/100`,
+          `Cost: $${totalCost.toFixed(2)}`,
+          `Status: ${data.pipelineStatus?.toUpperCase() || 'UNKNOWN'}`,
+        ];
+
+        setTicker(items.join(' • '));
+      } catch {
+        setTicker('PIPELINE DATA UNAVAILABLE');
+      }
+    };
+    fetchTicker();
+    const interval = setInterval(fetchTicker, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -78,10 +111,10 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Center: Ticker */}
+      {/* Center: Ticker — REAL DATA */}
       <div className="ticker-wrap" style={{
         flex: 1,
-        maxWidth: '500px',
+        maxWidth: '600px',
         margin: '0 32px',
         borderLeft: '1px solid rgba(245, 158, 11, 0.15)',
         borderRight: '1px solid rgba(245, 158, 11, 0.15)',
@@ -92,18 +125,11 @@ export default function Header() {
           color: '#94a3b8',
           letterSpacing: '0.5px',
         }}>
-          <span style={{ color: '#22c55e' }}>▲ POD</span> 12 designs today &nbsp;•&nbsp;
-          <span style={{ color: '#f59e0b' }}>◆ AURA</span> $2.4K revenue &nbsp;•&nbsp;
-          <span style={{ color: '#3b82f6' }}>● MDP</span> 847 units &nbsp;•&nbsp;
-          <span style={{ color: '#22c55e' }}>▲ ONESHOT</span> v2.1 live &nbsp;•&nbsp;
-          <span style={{ color: '#f59e0b' }}>◆ LICENSING</span> 3 active deals &nbsp;•&nbsp;
-          <span style={{ color: '#22c55e' }}>▲ MARCUS</span> all systems nominal &nbsp;•&nbsp;
-          <span style={{ color: '#22c55e' }}>▲ POD</span> 12 designs today &nbsp;•&nbsp;
-          <span style={{ color: '#f59e0b' }}>◆ AURA</span> $2.4K revenue &nbsp;•&nbsp;
-          <span style={{ color: '#3b82f6' }}>● MDP</span> 847 units &nbsp;•&nbsp;
-          <span style={{ color: '#22c55e' }}>▲ ONESHOT</span> v2.1 live &nbsp;•&nbsp;
-          <span style={{ color: '#f59e0b' }}>◆ LICENSING</span> 3 active deals &nbsp;•&nbsp;
-          <span style={{ color: '#22c55e' }}>▲ MARCUS</span> all systems nominal &nbsp;•&nbsp;
+          <span style={{ color: '#22c55e' }}>▲ LIVE</span>&nbsp;
+          {ticker}
+          &nbsp;•&nbsp;
+          <span style={{ color: '#22c55e' }}>▲ LIVE</span>&nbsp;
+          {ticker}
         </div>
       </div>
 
