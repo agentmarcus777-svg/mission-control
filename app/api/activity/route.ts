@@ -38,10 +38,10 @@ function formatDuration(seconds: number): string {
   return `${Math.floor(mins / 60)}h ${mins % 60}m`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     // Fetch real data from POD Pipeline API
-    const pipelineRes = await fetch('http://localhost:3001/api/pipeline-status', {
+    const pipelineRes = await fetch(`${new URL(request.url).origin}/api/pipeline-status`, {
       cache: 'no-store',
     });
 

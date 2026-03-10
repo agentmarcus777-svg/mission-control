@@ -40,7 +40,7 @@ export default function QuickStats() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/pipeline-status');
+        const res = await fetch('/api/pipeline-status');
         if (!res.ok) return;
         const data: PipelineData = await res.json();
 

@@ -38,7 +38,7 @@ export default function EmpireCards() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/pipeline-status');
+        const res = await fetch('/api/pipeline-status');
         if (!res.ok) return;
         const data = await res.json();
 
@@ -181,7 +181,7 @@ function getDefaultCards(): CardData[] {
         { label: 'Cost', value: '—' },
       ],
       status: 'warning',
-      link: 'http://localhost:3001',
+      link: process.env.NEXT_PUBLIC_POD_PIPELINE_URL || '/calendar',
       color: '#22c55e',
     },
     {

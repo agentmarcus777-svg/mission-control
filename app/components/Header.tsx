@@ -31,7 +31,7 @@ export default function Header() {
   useEffect(() => {
     const fetchTicker = async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/pipeline-status');
+        const res = await fetch('/api/pipeline-status');
         if (!res.ok) {
           setTicker('PIPELINE OFFLINE — Dashboard at localhost:3001 unreachable');
           return;

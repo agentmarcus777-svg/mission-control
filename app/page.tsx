@@ -11,6 +11,9 @@ import SectionTitle from './components/SectionTitle';
 import QuickStats from './components/QuickStats';
 import SearchPanel from './components/SearchPanel';
 import WeeklyCalendar from './components/WeeklyCalendar';
+import AgentQueueBoard from './components/AgentQueueBoard';
+import SecondBrainOrb from './components/SecondBrainOrb';
+import PodEventsPanel from './components/PodEventsPanel';
 
 const Globe = dynamic(() => import('./components/Globe'), {
   ssr: false,
@@ -29,7 +32,7 @@ const Globe = dynamic(() => import('./components/Globe'), {
   ),
 });
 
-type NavTab = 'dashboard' | 'search' | 'calendar';
+type NavTab = 'dashboard' | 'search' | 'calendar' | 'agents';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
@@ -38,6 +41,7 @@ export default function Home() {
     { id: 'dashboard', label: 'DASHBOARD', icon: '◆' },
     { id: 'search', label: 'SEARCH', icon: '⌕' },
     { id: 'calendar', label: 'CALENDAR', icon: '▦' },
+    { id: 'agents', label: 'AGENTS', icon: '◉' },
   ];
 
   return (
@@ -145,12 +149,15 @@ export default function Home() {
                   }}>
                     🌐 GLOBAL OPERATIONS
                   </div>
-                  <div style={{
-                    fontSize: '10px',
-                    color: '#22c55e',
-                    fontFamily: "'JetBrains Mono', monospace",
-                  }}>
-                    ● LIVE
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      fontSize: '10px',
+                      color: '#22c55e',
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}>
+                      ● LIVE
+                    </div>
+                    <SecondBrainOrb />
                   </div>
                 </div>
                 <Globe />
@@ -192,6 +199,19 @@ export default function Home() {
                 <SectionTitle title="Activity Feed" icon="📡" subtitle="Real-time operations log" />
                 <ActivityFeed />
               </div>
+
+              <div style={{
+                marginTop: '24px',
+                background: 'rgba(21, 21, 48, 0.3)',
+                borderRadius: '12px',
+                border: '1px solid rgba(245, 158, 11, 0.1)',
+                padding: '20px',
+              }}>
+                <SectionTitle title="POD Pipeline Calendar" icon="🗓️" subtitle="Seasonal pushes and upcoming POD deadlines" />
+                <div style={{ marginTop: '16px' }}>
+                  <PodEventsPanel />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -226,6 +246,23 @@ export default function Home() {
             <SectionTitle title="Weekly Calendar" icon="📅" subtitle="Scheduled tasks and events" />
             <div style={{ marginTop: '16px' }}>
               <WeeklyCalendar />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AGENTS VIEW */}
+      {activeTab === 'agents' && (
+        <div style={{ padding: '24px 32px' }}>
+          <div style={{
+            background: 'rgba(21, 21, 48, 0.3)',
+            borderRadius: '12px',
+            border: '1px solid rgba(245, 158, 11, 0.1)',
+            padding: '24px',
+          }}>
+            <SectionTitle title="Agent Task Queue" icon="🤖" subtitle="Marcus + Titus live tasks, priorities, and current work" />
+            <div style={{ marginTop: '16px' }}>
+              <AgentQueueBoard />
             </div>
           </div>
         </div>

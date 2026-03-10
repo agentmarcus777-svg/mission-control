@@ -13,13 +13,13 @@ interface CalendarEvent {
   category: string;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const events: CalendarEvent[] = [];
 
     // Pull real batch run data from pipeline API
     try {
-      const pipelineRes = await fetch('http://localhost:3001/api/pipeline-status', {
+      const pipelineRes = await fetch(`${new URL(request.url).origin}/api/pipeline-status`, {
         cache: 'no-store',
       });
       if (pipelineRes.ok) {
